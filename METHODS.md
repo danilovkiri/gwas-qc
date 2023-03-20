@@ -138,3 +138,15 @@ The QC resulted in exclusion of total 1633 markers leaving 12895 markers intact 
 5. Mode — Imputation
 
 The QC resulted in exclusion of total 148 markers leaving 6285 markers intact with 1369 typed-only sites.
+
+## HLA imputation (4-digit)
+
+5798 samples were used for the imputation with 41237 markers aligned to GRCh38.p13 at chr6 with the following options:
+
+1. Reference panel — 4-Digit Multi-ethnic HLA Reference Panel v2 (GRCh37/hg19)
+2. Array Build — GRCh38/hg38
+3. rsq Filter — off
+4. Phasing — Eagle v2.4 
+5. Mode — Imputation
+
+The QC resulted in exclusion of total 147 markers leaving 7233 markers intact with 422 typed-only sites.
