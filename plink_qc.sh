@@ -55,3 +55,25 @@ ${BCFTOOLS_EXECUTABLE} index --tbi --threads ${THREADS} ${BINARY}/filtered.vcf.g
 ${PLINK_EXECUTABLE} --bfile ${BINARY}/filtered --recode vcf-iid --output-chr chrM --chr X,XY --out ${BINARY}/filtered_chrX
 bgzip -@ ${THREADS} ${BINARY}/filtered_chrX.vcf
 ${BCFTOOLS_EXECUTABLE} index --tbi --threads ${THREADS} ${BINARY}/filtered_chrX.vcf.gz
+
+# after imputation (create and change directories as necessary)
+## merge all files
+${BCFTOOLS_EXECUTABLE} concat ./autosomes/vcfs/chr1.dose.vcf.gz ./autosomes/vcfs/chr2.dose.vcf.gz \
+./autosomes/vcfs/chr3.dose.vcf.gz ./autosomes/vcfs/chr4.dose.vcf.gz \
+./autosomes/vcfs/chr5.dose.vcf.gz ./autosomes/vcfs/chr6.dose.vcf.gz \
+./autosomes/vcfs/chr7.dose.vcf.gz ./autosomes/vcfs/chr8.dose.vcf.gz \
+./autosomes/vcfs/chr9.dose.vcf.gz ./autosomes/vcfs/chr10.dose.vcf.gz \
+./autosomes/vcfs/chr11.dose.vcf.gz ./autosomes/vcfs/chr12.dose.vcf.gz \
+./autosomes/vcfs/chr13.dose.vcf.gz ./autosomes/vcfs/chr14.dose.vcf.gz \
+./autosomes/vcfs/chr15.dose.vcf.gz ./autosomes/vcfs/chr16.dose.vcf.gz \
+./autosomes/vcfs/chr17.dose.vcf.gz ./autosomes/vcfs/chr18.dose.vcf.gz \
+./autosomes/vcfs/chr19.dose.vcf.gz ./autosomes/vcfs/chr20.dose.vcf.gz \
+./autosomes/vcfs/chr21.dose.vcf.gz ./autosomes/vcfs/chr22.dose.vcf.gz \
+./chrx/vcfs/chrX.dose.vcf.gz -O z -o ./combined/combined.vcf.gz --threads 12
+${BCFTOOLS_EXECUTABLE} index --tbi --threads 12 combined.vcf.gz
+## calculate statistics
+${PLINK2_EXECUTABLE} --vcf combined.vcf.gz --freq --recode vcf-iid --out combined_for_filtering
+cat combined_for_filtering.afreq | awk -v FS=" " '{if($5 == 0) print $2}' > exclusion
+${PLINK2_EXECUTABLE} --vcf ./combined.vcf.gz --exclude ./exclusion --recode vcf-iid --out ./combined.poly
+bgzip -@ 12 combined.poly.vcf
+${BCFTOOLS_EXECUTABLE} index --tbi --threads 11 combined.poly.vcf.gz
